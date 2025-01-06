@@ -1,0 +1,300 @@
+:root {
+    --primary-color: #2481cc;
+    --error-color: #ea4335;
+    --success-color: #34a853;
+    --bg-color: #f5f5f5;
+    --text-color: #333;
+    --border-color: #ddd;
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Общие стили */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-color);
+    margin: 0;
+    padding: 20px;
+}
+
+/* Контейнеры */
+.container, .admin-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+/* Заголовки и текст */
+h1, h2, h3 {
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+/* Формы и поля ввода */
+.form-group {
+    margin-bottom: 16px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+}
+
+/* Кнопки */
+button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button[type="submit"] {
+    background: var(--success-color);
+    color: white;
+}
+
+.logout-button {
+    background: var(--error-color);
+    color: white;
+}
+
+/* Карточки событий */
+.market-card {
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    margin-bottom: 12px;
+}
+
+.market-card h3 {
+    margin-top: 0;
+}
+
+/* Действия */
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.actions button {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+/* Форма создания */
+.create-form {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--bg-color);
+    border-radius: 8px;
+}
+
+/* Список событий */
+.markets-list {
+    display: grid;
+    gap: 15px;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.market-card {
+    animation: fadeIn 0.3s ease;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: var(--bg-color);
+    border-radius: 6px;
+    margin: 10px 0;
+}
+
+.stats p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.market-card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.market-card h3 {
+    margin: 0 0 10px;
+    color: var(--text-color);
+}
+
+.rules {
+    margin: 15px 0;
+    padding: 10px;
+    background: var(--bg-color);
+    border-radius: 6px;
+}
+
+/* Модальное окно */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Уведомления */
+.notification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.notification {
+    position: static;
+    background: white;
+    padding: 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    min-width: 300px;
+    max-width: 80%;
+    transform: none;
+    top: auto;
+    right: auto;
+    animation: fadeIn 0.2s ease;
+}
+
+.notification.success {
+    border-left: 5px solid var(--success-color);
+}
+
+.notification.error {
+    border-left: 5px solid var(--error-color);
+}
+
+.notification-message {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.notification-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.edit-modal {
+    width: 600px;
+}
+
+.edit-modal .form-group {
+    margin-bottom: 15px;
+}
+
+.edit-modal label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.edit-modal input,
+.edit-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.edit-modal textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.edit-modal .modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.edit-modal .cancel-button {
+    background: #f1f1f1;
+    color: var(--text-color);
+}
+
+.edit-modal .save-button {
+    background: var(--success-color);
+    color: white;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.clickable:hover {
+    color: var(--primary-color);
+}
+
+.market-title {
+    margin-bottom: 10px;
+    font-size: 18px;
+} 

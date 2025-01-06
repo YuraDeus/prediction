@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prediction Markets</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <h1>Crypto Predictions</h1>
+            <div class="wallet">
+                <span class="balance">1000 TON</span>
+                <button id="connectWallet">Подключить кошелек</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="markets">Активные прогнозы</button>
+            <button class="tab-button" data-tab="my-bets">Мои прогнозы</button>
+            <button class="tab-button" data-tab="history">История</button>
+        </nav>
+
+        <div class="market-categories">
+            <button class="category-button active" data-category="all">Все рынки</button>
+            <button class="category-button" data-category="crypto">Крипто</button>
+            <button class="category-button" data-category="business">Бизнес</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Поиск событий...">
+        </div>
+
+        <div id="marketsList" class="section active">
+            <!-- Маркеты добавляются через JavaScript -->
+        </div>
+
+        <div id="myBets" class="section">
+            <!-- Ставки добавляются через JavaScript -->
+        </div>
+
+        <div id="history" class="section">
+            <!-- История добавляется через JavaScript -->
+        </div>
+
+        <div id="marketDetails" class="section">
+            <!-- Контент будет добавляться динамически -->
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

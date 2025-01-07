@@ -472,8 +472,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Пользователь авторизован:', user);
         updateUserInterface(user);
     } else {
-        console.log('Пользователь не авторизован');
-        showAuthPrompt();
+        console.log('Ошибка авторизации');
+        showAuthError();
     }
 });
 
@@ -549,3 +549,26 @@ window.addEventListener('message', (event) => {
 
 // Добавляем автоматическое обновление каждые 30 секунд
 setInterval(updateMarketsDisplay, 30000);
+
+// Функция для проверки обновлений
+function checkForUpdates() {
+    const currentVersion = localStorage.getItem('app_version');
+    
+    fetch('https://api.github.com/repos/yuradeus/prediction/commits/main')
+        .then(response => response.json())
+        .then(data => {
+            const latestVersion = data.sha;
+            
+            if (currentVersion !== latestVersion) {
+                localStorage.setItem('app_version', latestVersion);
+                window.location.reload();
+            }
+        })
+        .catch(error => console.error('Ошибка проверки обновлений:', error));
+}
+
+// Проверяем обновления каждые 5 минут
+setInterval(checkForUpdates, 5 * 60 * 1000);
+
+// Проверяем при загрузке страницы
+document.addEventListener('DOMContentLoaded', checkForUpdates);

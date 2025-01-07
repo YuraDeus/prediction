@@ -89,6 +89,13 @@ function createMarketEvent(event) {
     localStorage.setItem('markets', JSON.stringify(markets));
     form.reset();
     displayMarkets();
+    
+    // Добавляем отправку события
+    window.parent.postMessage({
+        type: 'MARKET_UPDATED',
+        markets: markets
+    }, '*');
+    
     showNotification('Событие успешно создано');
 }
 
@@ -177,6 +184,13 @@ function deleteMarket(id) {
         markets = markets.filter(market => market.id !== id);
         localStorage.setItem('markets', JSON.stringify(markets));
         displayMarkets();
+        
+        // Добавляем отправку события
+        window.parent.postMessage({
+            type: 'MARKET_UPDATED',
+            markets: markets
+        }, '*');
+        
         overlay.remove();
         showNotification('Событие удалено');
     };
@@ -254,6 +268,13 @@ function editMarket(id) {
 
         localStorage.setItem('markets', JSON.stringify(markets));
         displayMarkets();
+        
+        // Добавляем отправку события
+        window.parent.postMessage({
+            type: 'MARKET_UPDATED',
+            markets: markets
+        }, '*');
+        
         overlay.remove();
         showNotification('Событие обновлено');
     };

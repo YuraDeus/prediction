@@ -663,3 +663,73 @@ h1 {
     padding: 2px 8px;
     border-radius: 12px;
 }
+
+/* Стили для информации о пользователе */
+.user-info {
+    background: var(--tg-theme-secondary-bg-color);
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.username {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tg-theme-text-color);
+}
+
+.user-tag {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+}
+
+.user-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.stat {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+}
+
+/* Стили для приглашения авторизоваться */
+.auth-prompt {
+    text-align: center;
+    padding: 20px;
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.auth-prompt p {
+    margin-bottom: 12px;
+    color: var(--tg-theme-hint-color);
+}
+
+.auth-prompt button {
+    background: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.no-markets {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--tg-theme-hint-color);
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 12px;
+    margin: 20px 0;
+}

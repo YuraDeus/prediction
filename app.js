@@ -432,17 +432,29 @@ function showMarketDetails(market) {
 
 // Функция для получения всех событий
 function getMarkets() {
-    // Получаем события только из админ-панели
-    return JSON.parse(localStorage.getItem('markets') || '[]');
+    try {
+        const markets = localStorage.getItem('markets');
+        return markets ? JSON.parse(markets) : [];
+    } catch (error) {
+        console.error('Ошибка при получении рынков:', error);
+        return [];
+    }
 }
 
 // Обновляем список событий в основном приложении
 function updateMarketsDisplay() {
     const marketsList = document.getElementById('marketsList');
+    if (!marketsList) return;
+
     const currentMarkets = getMarkets();
-    console.log('Текущие события:', currentMarkets); // Добавим для отладки
+    console.log('Обновление списка рынков:', currentMarkets);
 
     marketsList.innerHTML = '';
+    if (currentMarkets.length === 0) {
+        marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
+        return;
+    }
+
     currentMarkets.forEach(market => {
         marketsList.appendChild(createMarketCard(market));
     });
@@ -452,50 +464,65 @@ function updateMarketsDisplay() {
 document.addEventListener('DOMContentLoaded', updateMarketsDisplay);
 
 // Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-    // Проверяем режим работы
-    const isTestMode = window.location.search.includes('test=true');
-    if (isTestMode) {
-        console.log('Приложение запущено в тестовом режиме');
-        document.body.classList.add('test-mode');
-    }
-
-    // Инициализируем сессию
+document.addEventListener('DOMContentLoaded', async () => {
+    // Инициализируем сессию Telegram
     const user = telegramSession.initSession();
     
     if (user) {
-        console.log('Authenticated user:', user);
-        // Обновляем интерфейс для авторизованного пользователя
+        console.log('Пользователь авторизован:', user);
         updateUserInterface(user);
     } else {
-        console.log('User not authenticated');
+        console.log('Пользователь не авторизован');
+        showAuthPrompt();
     }
-
-    // Обновляем время активности каждые 5 минут
-    setInterval(() => {
-        telegramSession.updateLastActive();
-    }, 5 * 60 * 1000);
-
-    // Остальной код инициализации
-    updateMarketsDisplay();
 });
 
-// Функция обновления интерфейса
+// Функция обновления интерфейса для авторизованного пользователя
 function updateUserInterface(user) {
-    const userData = telegramSession.getUserData() || {};
-    const stats = userData.stats || {};
-    
     const header = document.querySelector('header');
+    const userData = telegramSession.getUserData();
+    const stats = userData?.stats || {};
+
+    // Обновляем информацию о пользователе в шапке
     const userInfo = document.createElement('div');
     userInfo.className = 'user-info';
     userInfo.innerHTML = `
-        <span class="username">${user.firstName}</span>
+        <div class="user-profile">
+            <span class="username">${user.firstName} ${user.lastName || ''}</span>
+            ${user.username ? `<span class="user-tag">@${user.username}</span>` : ''}
+        </div>
         <div class="user-stats">
+            <span class="stat">Баланс: ${stats.totalAmount || 0} TON</span>
             <span class="stat">Ставок: ${stats.totalBets || 0}</span>
-            <span class="stat">TON: ${stats.totalAmount || 0}</span>
         </div>
     `;
-    header.appendChild(userInfo);
+
+    // Находим существующий user-info или добавляем новый
+    const existingUserInfo = header.querySelector('.user-info');
+    if (existingUserInfo) {
+        existingUserInfo.replaceWith(userInfo);
+    } else {
+        header.appendChild(userInfo);
+    }
+
+    // Обновляем кнопку кошелька
+    const walletButton = document.getElementById('connectWallet');
+    if (walletButton) {
+        walletButton.textContent = 'Подключено';
+        walletButton.disabled = true;
+    }
+}
+
+// Функция для показа приглашения авторизоваться
+function showAuthPrompt() {
+    const header = document.querySelector('header');
+    const authPrompt = document.createElement('div');
+    authPrompt.className = 'auth-prompt';
+    authPrompt.innerHTML = `
+        <p>Войдите через Telegram для доступа к прогнозам</p>
+        <button onclick="telegramSession.initSession()">Войти</button>
+    `;
+    header.appendChild(authPrompt);
 }
 
 // Слушаем обновления от админ-панели
@@ -508,3 +535,17 @@ window.addEventListener('showMarketDetails', (event) => {
     const market = event.detail.market;
     showMarketDetails(market);
 });
+
+// Добавляем слушатель сообщений от админ-панели
+window.addEventListener('message', (event) => {
+    if (event.data.type === 'MARKET_UPDATED') {
+        console.log('Получено обновление рынков:', event.data.markets);
+        // Обновляем локальное хранилище
+        localStorage.setItem('markets', JSON.stringify(event.data.markets));
+        // Обновляем отображение
+        updateMarketsDisplay();
+    }
+});
+
+// Добавляем автоматическое обновление каждые 30 секунд
+setInterval(updateMarketsDisplay, 30000);

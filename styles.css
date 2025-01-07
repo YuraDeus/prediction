@@ -117,14 +117,6 @@ header {
         flex-wrap: wrap;
     }
 
-    .wallet {
-        width: 100%;
-        margin-top: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
     .market-categories {
         margin: 8px -12px;
         padding: 0 12px;

@@ -6,9 +6,6 @@ const APP_VERSION = new Date().getTime();
 // Убираем демо-данные
 const markets = [];  // Теперь все события будут загружаться из админ-панели
 
-let userBalance = 1000;
-let isWalletConnected = false;
-const MAX_BET_AMOUNT = 10;
 let userBets = [];
 
 // Вспомогательные функции
@@ -503,13 +500,6 @@ function updateUserInterface(user) {
         userTag.style.display = 'block';
     } else {
         userTag.style.display = 'none';
-    }
-
-    // Обновляем кнопку кошелька
-    const walletButton = document.getElementById('connectWallet');
-    if (walletButton) {
-        walletButton.textContent = 'Подключено';
-        walletButton.disabled = true;
     }
 }
 

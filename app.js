@@ -543,6 +543,15 @@ setInterval(updateMarketsDisplay, 30000);
 // Функция для проверки обновлений
 function checkForUpdates() {
     const currentVersion = localStorage.getItem('app_version');
+    const lastCheck = localStorage.getItem('last_check_time');
+    const now = Date.now();
+    
+    // Проверяем не чаще раза в минуту
+    if (lastCheck && now - parseInt(lastCheck) < 60000) {
+        return;
+    }
+    
+    localStorage.setItem('last_check_time', now);
     
     fetch('https://api.github.com/repos/YuraDeus/prediction/commits/main' + '?v=' + APP_VERSION)
         .then(response => response.json())
@@ -551,15 +560,15 @@ function checkForUpdates() {
             
             if (currentVersion !== latestVersion) {
                 localStorage.setItem('app_version', latestVersion);
-                localStorage.clear();  // Очищаем весь кеш
-                window.location.reload(true);  // Принудительная перезагрузка
+                // Мягкое обновление только при существенных изменениях
+                updateMarketsDisplay();
             }
         })
         .catch(error => console.error('Ошибка проверки обновлений:', error));
 }
 
-// Проверяем обновления каждые 30 секунд
-setInterval(checkForUpdates, 30 * 1000);  // Каждые 30 секунд
+// Проверяем раз в 2 минуты
+setInterval(checkForUpdates, 120 * 1000);
 
 // Проверяем при загрузке страницы
 document.addEventListener('DOMContentLoaded', checkForUpdates);

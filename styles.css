@@ -54,6 +54,10 @@ h1::before {
     box-shadow: 0 4px 15px rgba(255, 215, 0, 0.1);
     transition: all 0.2s ease;
     border: 2px solid #ffd700;
+    min-height: 120px;
+    opacity: 1;
+    transform: translateY(0);
+    will-change: transform, opacity;
 }
 
 header {
@@ -65,6 +69,10 @@ header {
     background: var(--gradient-primary);
     border-radius: 16px;
     box-shadow: var(--shadow-md);
+    min-height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 /* Стили для профиля пользователя */
@@ -73,6 +81,7 @@ header {
     align-items: center;
     gap: 12px;
     flex: 1;
+    min-height: 36px;
 }
 
 .user-avatar {
@@ -110,11 +119,13 @@ header {
 @media (max-width: 480px) {
     .app {
         padding: 12px;
+        padding-top: 0;
     }
 
     header {
         padding: 12px;
         flex-wrap: wrap;
+        border-radius: 0 0 16px 16px;
     }
 
     .market-categories {
@@ -131,4 +142,18 @@ header {
         padding: 16px;
         margin-bottom: 12px;
     }
+}
+
+/* Плавные переходы для контента */
+.app {
+    min-height: 100vh;
+    transition: opacity 0.3s ease;
+}
+
+/* Предотвращаем прыжки при загрузке шрифтов */
+html {
+    font-display: optional;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }

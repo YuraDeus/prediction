@@ -1,5 +1,8 @@
 import { telegramSession } from './src/telegram.js';
 
+// В начале файла добавим версию
+const APP_VERSION = new Date().getTime();
+
 // Убираем демо-данные
 const markets = [];  // Теперь все события будут загружаться из админ-панели
 
@@ -554,21 +557,22 @@ setInterval(updateMarketsDisplay, 30000);
 function checkForUpdates() {
     const currentVersion = localStorage.getItem('app_version');
     
-    fetch('https://api.github.com/repos/yuradeus/prediction/commits/main')
+    fetch('https://api.github.com/repos/YuraDeus/prediction/commits/main' + '?v=' + APP_VERSION)
         .then(response => response.json())
         .then(data => {
             const latestVersion = data.sha;
             
             if (currentVersion !== latestVersion) {
                 localStorage.setItem('app_version', latestVersion);
-                window.location.reload();
+                localStorage.clear();  // Очищаем весь кеш
+                window.location.reload(true);  // Принудительная перезагрузка
             }
         })
         .catch(error => console.error('Ошибка проверки обновлений:', error));
 }
 
-// Проверяем обновления каждые 5 минут
-setInterval(checkForUpdates, 5 * 60 * 1000);
+// Проверяем обновления каждые 30 секунд
+setInterval(checkForUpdates, 30 * 1000);  // Каждые 30 секунд
 
 // Проверяем при загрузке страницы
 document.addEventListener('DOMContentLoaded', checkForUpdates);

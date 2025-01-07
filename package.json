@@ -1,8 +1,0 @@
-{
-  "name": "prediction-markets",
-  "version": "1.0.0",
-  "description": "Telegram Mini App for Prediction Markets",
-  "scripts": {
-    "deploy": "git add . && git commit -m \"Update app\" && git push origin main"
-  }
-} 

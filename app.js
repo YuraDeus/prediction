@@ -483,29 +483,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Функция обновления интерфейса для авторизованного пользователя
 function updateUserInterface(user) {
     const header = document.querySelector('header');
-    const userData = telegramSession.getUserData();
-    const stats = userData?.stats || {};
+    // Обновляем информацию пользователя
+    const userAvatar = document.querySelector('.user-avatar');
+    const username = document.querySelector('.username');
+    const userTag = document.querySelector('.user-tag');
 
-    // Обновляем информацию о пользователе в шапке
-    const userInfo = document.createElement('div');
-    userInfo.className = 'user-info';
-    userInfo.innerHTML = `
-        <div class="user-profile">
-            <span class="username">${user.firstName} ${user.lastName || ''}</span>
-            ${user.username ? `<span class="user-tag">@${user.username}</span>` : ''}
-        </div>
-        <div class="user-stats">
-            <span class="stat">Баланс: ${stats.totalAmount || 0} TON</span>
-            <span class="stat">Ставок: ${stats.totalBets || 0}</span>
-        </div>
-    `;
-
-    // Находим существующий user-info или добавляем новый
-    const existingUserInfo = header.querySelector('.user-info');
-    if (existingUserInfo) {
-        existingUserInfo.replaceWith(userInfo);
+    // Добавляем аватар, если есть
+    if (user.photo_url) {
+        userAvatar.innerHTML = `<img src="${user.photo_url}" alt="${user.firstName}">`;
     } else {
-        header.appendChild(userInfo);
+        // Если аватара нет, показываем первую букву имени
+        userAvatar.innerHTML = `<div class="avatar-placeholder">${user.firstName.charAt(0)}</div>`;
+    }
+
+    // Обновляем имя и тег
+    username.textContent = `${user.firstName} ${user.lastName || ''}`;
+    if (user.username) {
+        userTag.textContent = `@${user.username}`;
+        userTag.style.display = 'block';
+    } else {
+        userTag.style.display = 'none';
     }
 
     // Обновляем кнопку кошелька

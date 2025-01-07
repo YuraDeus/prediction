@@ -33,6 +33,7 @@ export class TelegramSession {
                 lastName: user.last_name || '',
                 username: user.username || '',
                 languageCode: user.language_code,
+                photo_url: user.photo_url || '',
                 initData: initData
             };
 

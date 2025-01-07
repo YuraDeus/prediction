@@ -15,7 +15,7 @@ function calculateProbability(yesAmount, noAmount) {
 }
 
 function createMarketCard(market) {
-    const probability = calculateProbability(market.yesAmount, market.noAmount);
+    console.log('Данные события для карточки:', market);  // Отладочный вывод
     
     const card = document.createElement('div');
     card.className = 'market-card';
@@ -26,119 +26,15 @@ function createMarketCard(market) {
         <p class="market-description">${market.description}</p>
         <div class="market-stats">
             <div class="probability">
-                <div class="probability-bar" style="width: ${probability}%"></div>
-                <span class="probability-text">Вероятность: ${probability}%</span>
+                <div class="probability-bar" style="width: ${calculateProbability(market.yesAmount || 0, market.noAmount || 0)}%"></div>
+                <span class="probability-text">Вероятность: ${calculateProbability(market.yesAmount || 0, market.noAmount || 0)}%</span>
             </div>
             <div class="pool-info">
-                <div>YES: ${market.yesAmount} TON</div>
-                <div>NO: ${market.noAmount} TON</div>
-            </div>
-        </div>
-        <div class="bet-form">
-            <input type="number" class="bet-input" placeholder="Сумма в TON (макс. ${MAX_BET_AMOUNT})" />
-            <div class="error" style="display: none;"></div>
-            <div class="bet-buttons">
-                <button class="yes-button">YES</button>
-                <button class="no-button">NO</button>
+                <div>YES: ${market.yesAmount || 0} TON</div>
+                <div>NO: ${market.noAmount || 0} TON</div>
             </div>
         </div>
     `;
-
-    const input = card.querySelector('.bet-input');
-    const error = card.querySelector('.error');
-    const yesButton = card.querySelector('.yes-button');
-    const noButton = card.querySelector('.no-button');
-
-    function placeBet(isYes) {
-        const user = telegramSession.getTelegramUser();
-        if (user) {
-            // Сохраняем действие в историю
-            telegramSession.saveUserAction({
-                type: 'PLACE_BET',
-                data: {
-                    amount,
-                    isYes,
-                    marketId: market.id
-                }
-            });
-
-            // Обновляем статистику
-            const userStats = telegramSession.getUserData()?.stats || {};
-            telegramSession.updateUserStats({
-                totalBets: (userStats.totalBets || 0) + 1,
-                totalAmount: (userStats.totalAmount || 0) + amount
-            });
-
-            if (!user) {
-                error.textContent = 'Необходима авторизация через Telegram';
-                error.style.display = 'block';
-                return;
-            }
-
-            const amount = Number(input.value);
-            if (isNaN(amount) || amount <= 0) {
-                error.textContent = 'Введите корректную сумму';
-                error.style.display = 'block';
-                return;
-            }
-
-            if (amount > MAX_BET_AMOUNT) {
-                error.textContent = `Максимальная ставка: ${MAX_BET_AMOUNT} TON`;
-                error.style.display = 'block';
-                return;
-            }
-
-            if (amount > userBalance) {
-                error.textContent = 'Недостаточно средств';
-                error.style.display = 'block';
-                return;
-            }
-
-            // Создаем объект ставки
-            const bet = {
-                marketId: market.id,
-                amount: amount,
-                isYes: isYes,
-                timestamp: new Date(),
-                question: market.question
-            };
-
-            // Добавляем логирование
-            console.log('Создана новая ставка:', bet);
-            console.log('Текущие ставки до добавления:', userBets);
-
-            // Добавляем ставку в массив
-            userBets.push(bet);
-
-            console.log('Текущие ставки после добавления:', userBets);
-
-            // Обновляем баланс и пулы
-            userBalance -= amount;
-            if (isYes) {
-                market.yesAmount += amount;
-            } else {
-                market.noAmount += amount;
-            }
-
-            updateWalletInfo();
-            updateMyBets(); // Добавляем обновление раздела ставок
-            
-            const newProbability = calculateProbability(market.yesAmount, market.noAmount);
-            card.querySelector('.probability').textContent = `Вероятность: ${newProbability}%`;
-            
-            input.value = '';
-            error.style.display = 'none';
-        }
-    }
-
-    yesButton.addEventListener('click', () => placeBet(true));
-    noButton.addEventListener('click', () => placeBet(false));
-
-    // Добавляем обработчик клика на заголовок
-    const title = card.querySelector('.market-title');
-    title.addEventListener('click', () => {
-        showMarketDetails(market);
-    });
 
     return card;
 }
@@ -434,6 +330,7 @@ function showMarketDetails(market) {
 function getMarkets() {
     try {
         const markets = localStorage.getItem('markets');
+        console.log('Загруженные события:', markets);  // Отладочный вывод
         return markets ? JSON.parse(markets) : [];
     } catch (error) {
         console.error('Ошибка при получении рынков:', error);
@@ -449,14 +346,20 @@ function updateMarketsDisplay() {
     const currentMarkets = getMarkets();
     console.log('Обновление списка рынков:', currentMarkets);
 
+    // Очищаем список
     marketsList.innerHTML = '';
-    if (currentMarkets.length === 0) {
+
+    // Проверяем наличие событий
+    if (!currentMarkets || currentMarkets.length === 0) {
         marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
         return;
     }
 
+    // Создаем карточки для каждого события
     currentMarkets.forEach(market => {
-        marketsList.appendChild(createMarketCard(market));
+        console.log('Создаем карточку для события:', market);  // Отладочный вывод
+        const card = createMarketCard(market);
+        marketsList.appendChild(card);
     });
 }
 
@@ -530,9 +433,7 @@ window.addEventListener('showMarketDetails', (event) => {
 window.addEventListener('message', (event) => {
     if (event.data.type === 'MARKET_UPDATED') {
         console.log('Получено обновление рынков:', event.data.markets);
-        // Обновляем локальное хранилище
         localStorage.setItem('markets', JSON.stringify(event.data.markets));
-        // Обновляем отображение
         updateMarketsDisplay();
     }
 });

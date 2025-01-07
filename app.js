@@ -330,7 +330,7 @@ function showMarketDetails(market) {
 function getMarkets() {
     try {
         const markets = localStorage.getItem('markets');
-        console.log('Загруженные события:', markets);  // Отладочный вывод
+        console.log('Загруженные события:', markets);
         return markets ? JSON.parse(markets) : [];
     } catch (error) {
         console.error('Ошибка при получении рынков:', error);
@@ -433,7 +433,10 @@ window.addEventListener('showMarketDetails', (event) => {
 window.addEventListener('message', (event) => {
     if (event.data.type === 'MARKET_UPDATED') {
         console.log('Получено обновление рынков:', event.data.markets);
-        localStorage.setItem('markets', JSON.stringify(event.data.markets));
+        // Сохраняем в отдельное хранилище для админ-панели
+        localStorage.setItem('adminMarkets', JSON.stringify(event.data.markets));
+        // Синхронизируем с основным хранилищем
+        syncWithAdmin();
         updateMarketsDisplay();
     }
 });
@@ -473,3 +476,48 @@ setInterval(checkForUpdates, 120 * 1000);
 
 // Проверяем при загрузке страницы
 document.addEventListener('DOMContentLoaded', checkForUpdates);
+
+// Функции для работы с хранилищем и тестовыми данными
+function addTestEvent() {
+    const testEvent = {
+        id: Date.now(),
+        question: "Тестовое событие " + new Date().toLocaleString(),
+        description: "Описание тестового события",
+        yesAmount: 100,
+        noAmount: 50,
+        category: "crypto",
+        endDate: new Date(Date.now() + 86400000).toISOString()
+    };
+
+    const currentMarkets = getMarkets();
+    currentMarkets.push(testEvent);
+    localStorage.setItem('markets', JSON.stringify(currentMarkets));
+    updateMarketsDisplay();
+}
+
+function checkStorage() {
+    console.log('Текущие события:', getMarkets());
+    console.log('Все хранилище:', localStorage);
+}
+
+function clearStorage() {
+    localStorage.removeItem('markets');
+    updateMarketsDisplay();
+}
+
+// Добавляем функции в глобальную область видимости
+window.addTestEvent = addTestEvent;
+window.checkStorage = checkStorage;
+window.clearStorage = clearStorage;
+
+// Добавляем проверку синхронизации с админ-панелью
+function syncWithAdmin() {
+    const adminMarkets = localStorage.getItem('adminMarkets');
+    if (adminMarkets) {
+        localStorage.setItem('markets', adminMarkets);
+        updateMarketsDisplay();
+    }
+}
+
+// Проверяем синхронизацию каждые 5 секунд
+setInterval(syncWithAdmin, 5000);

@@ -1,5 +1,5 @@
 import { telegramSession } from './src/telegram.js';
-import { getMarketsData } from './src/storage.js';
+import { getMarkets } from './src/storage.js';
 
 // В начале файла добавим версию
 const APP_VERSION = new Date().getTime();
@@ -16,16 +16,33 @@ function calculateProbability(yesAmount, noAmount) {
 }
 
 function createMarketCard(market) {
-    console.log('Данные события для карточки:', market);
-    
     const card = document.createElement('div');
     card.className = 'market-card';
     
+    const probability = calculateProbability(market.yesAmount || 0, market.noAmount || 0);
+    
     card.innerHTML = `
-        <h2 class="market-title">${market.question}</h2>
+        <h3 class="market-title">${market.question}</h3>
         <p class="market-description">${market.description}</p>
+        <div class="probability">
+            <div class="probability-bar" style="width: ${probability}%"></div>
+        </div>
+        <div class="market-stats">
+            <div class="yes-stats">
+                <div>YES</div>
+                <div>${market.yesAmount || 0} TON</div>
+            </div>
+            <div class="no-stats">
+                <div>NO</div>
+                <div>${market.noAmount || 0} TON</div>
+            </div>
+        </div>
+        <div class="bet-buttons">
+            <button class="bet-btn bet-yes">YES</button>
+            <button class="bet-btn bet-no">NO</button>
+        </div>
     `;
-
+    
     return card;
 }
 
@@ -317,13 +334,8 @@ function showMarketDetails(market) {
 }
 
 // Функция получения событий
-async function getMarkets() {
-    try {
-        return await getMarketsData();
-    } catch (error) {
-        console.error('Ошибка при получении событий:', error);
-        return [];
-    }
+async function getMarketsFromStorage() {
+    return getMarkets();
 }
 
 // Обновление отображения
@@ -331,24 +343,20 @@ async function updateMarketsDisplay() {
     const marketsList = document.getElementById('marketsList');
     if (!marketsList) return;
 
-    try {
-        const markets = await getMarkets();
-        console.log('Загруженные события:', markets);
-
-        marketsList.innerHTML = '';
-        
-        if (!markets || markets.length === 0) {
-            marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
-            return;
-        }
-
-        markets.forEach(market => {
-            const card = createMarketCard(market);
-            marketsList.appendChild(card);
-        });
-    } catch (error) {
-        console.error('Ошибка при обновлении событий:', error);
+    const markets = getMarkets();
+    console.log('Пытаемся отобразить события:', markets);
+    
+    marketsList.innerHTML = '';
+    
+    if (!markets || markets.length === 0) {
+        marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
+        return;
     }
+
+    markets.forEach(market => {
+        const card = createMarketCard(market);
+        marketsList.appendChild(card);
+    });
 }
 
 // Вызываем обновление при загрузке страницы
@@ -366,6 +374,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Ошибка авторизации');
         showAuthError();
     }
+    
+    // Загружаем и отображаем события
+    console.log('Загружаем события из хранилища');
+    updateMarketsDisplay();
 });
 
 // Функция обновления интерфейса для авторизованного пользователя
@@ -406,27 +418,25 @@ function showAuthPrompt() {
     header.appendChild(authPrompt);
 }
 
-// Слушаем обновления от админ-панели
-window.addEventListener('marketsUpdated', () => {
-    console.log('Получено обновление от админ-панели');
-    updateMarketsDisplay();
-});
-
 window.addEventListener('showMarketDetails', (event) => {
     const market = event.detail.market;
     showMarketDetails(market);
 });
 
 // Добавляем слушатель сообщений от админ-панели
-window.addEventListener('message', async (event) => {
+window.addEventListener('message', (event) => {
+    console.log('Получено сообщение в основном приложении:', {
+        origin: event.origin,
+        data: event.data,
+        source: event.source
+    });
+
     if (event.data.type === 'MARKET_UPDATED') {
         console.log('Получено обновление от админ-панели:', event.data.markets);
-        await updateMarketsDisplay();
+        localStorage.setItem('prediction_markets', JSON.stringify(event.data.markets));
+        updateMarketsDisplay();
     }
 });
-
-// Добавляем автоматическое обновление каждые 30 секунд
-setInterval(updateMarketsDisplay, 30000);
 
 // Функция для проверки обновлений
 function checkForUpdates() {
@@ -460,67 +470,3 @@ setInterval(checkForUpdates, 120 * 1000);
 
 // Проверяем при загрузке страницы
 document.addEventListener('DOMContentLoaded', checkForUpdates);
-
-// Функции для работы с хранилищем и тестовыми данными
-function addTestEvent() {
-    const testEvent = {
-        id: Date.now(),
-        question: "Тестовое событие " + new Date().toLocaleString(),
-        description: "Описание тестового события",
-        yesAmount: 100,
-        noAmount: 50,
-        category: "crypto",
-        endDate: new Date(Date.now() + 86400000).toISOString()
-    };
-
-    const currentMarkets = getMarkets();
-    currentMarkets.push(testEvent);
-    localStorage.setItem('markets', JSON.stringify(currentMarkets));
-    updateMarketsDisplay();
-}
-
-function checkStorage() {
-    console.log('Текущие события:', getMarkets());
-    console.log('Все хранилище:', localStorage);
-}
-
-function clearStorage() {
-    localStorage.removeItem('markets');
-    updateMarketsDisplay();
-}
-
-// Добавляем функции в глобальную область видимости
-window.addTestEvent = addTestEvent;
-window.checkStorage = checkStorage;
-window.clearStorage = clearStorage;
-
-// Добавляем проверку синхронизации с админ-панелью
-function syncWithAdmin() {
-    const adminMarkets = localStorage.getItem('adminMarkets');
-    console.log('Данные из админ-панели:', adminMarkets);
-    
-    if (adminMarkets) {
-        try {
-            const markets = JSON.parse(adminMarkets);
-            console.log('Распарсенные данные:', markets);
-            localStorage.setItem('markets', adminMarkets);
-            updateMarketsDisplay();
-        } catch (error) {
-            console.error('Ошибка парсинга данных:', error);
-        }
-    }
-}
-
-// Проверяем синхронизацию каждые 5 секунд
-setInterval(syncWithAdmin, 5000);
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Добавляем тестовое событие
-    const testEvent = {
-        question: "Тестовое событие",
-        description: "Это тестовое событие для проверки отображения"
-    };
-    
-    localStorage.setItem('markets', JSON.stringify([testEvent]));
-    updateMarketsDisplay();
-});

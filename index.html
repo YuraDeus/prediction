@@ -16,21 +16,36 @@
 <body>
     <div class="app">
         <header>
-            <div class="user-info">
-                <div class="user-profile">
-                    <div class="user-avatar"></div>
-                    <div class="user-details">
-                        <span class="username"></span>
-                        <span class="user-tag"></span>
-                    </div>
+            <div class="user-profile">
+                <div class="user-avatar"></div>
+                <div class="user-info">
+                    <span class="username"></span>
+                    <span class="user-tag"></span>
                 </div>
             </div>
-            <h1>Lemon Prediction</h1>
+            <div class="balance">
+                <span class="balance-amount">0 TON</span>
+            </div>
         </header>
 
-        <div id="marketsList" class="section active">
-            <!-- Маркеты добавляются через JavaScript -->
+        <div class="categories">
+            <button class="category-btn active">All</button>
+            <button class="category-btn">Crypto</button>
+            <button class="category-btn">Sports</button>
+            <button class="category-btn">Politics</button>
         </div>
+
+        <div id="marketsList" class="markets-list">
+            <!-- События будут добавляться через JavaScript -->
+        </div>
+
+        <!-- Добавляем админ-панель в iframe -->
+        <iframe 
+            src="admin-panel/index.html" 
+            style="width:0; height:0; border:0; border:none;"
+            allow="cross-origin-isolated"
+            id="adminPanel"
+        ></iframe>
     </div>
 </body>
 </html>

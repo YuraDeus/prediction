@@ -284,18 +284,43 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMarkets();
 });
 
-async function loadMarkets() {
-    markets = await getMarketsData();
-    displayMarkets();
+// Функция сохранения событий
+async function saveMarket(market) {
+    try {
+        // Получаем текущие события
+        const markets = await getMarketsData();
+        
+        // Добавляем новое событие
+        markets.push(market);
+        
+        // Сохраняем в GitHub
+        await saveMarketsData(markets);
+        
+        // Обновляем отображение
+        displayMarkets();
+        
+        // Отправляем сообщение в основное приложение
+        window.parent.postMessage({
+            type: 'MARKET_UPDATED',
+            markets: markets
+        }, '*');
+        
+        showNotification('Событие успешно добавлено');
+    } catch (error) {
+        console.error('Ошибка при сохранении события:', error);
+        showNotification('Ошибка при сохранении события', 'error');
+    }
 }
 
-async function saveMarkets() {
-    await saveMarketsData(markets);
-    // Отправляем сообщение в основное приложение
-    window.parent.postMessage({
-        type: 'MARKET_UPDATED',
-        markets: markets
-    }, '*');
+// Функция загрузки событий
+async function loadMarkets() {
+    try {
+        const markets = await getMarketsData();
+        displayMarkets(markets);
+    } catch (error) {
+        console.error('Ошибка при загрузке событий:', error);
+        showNotification('Ошибка при загрузке событий', 'error');
+    }
 }
 
 function setGithubToken(token) {
@@ -307,4 +332,36 @@ if (localStorage.getItem('GITHUB_TOKEN')) {
     console.log('GitHub токен найден');
 } else {
     console.error('GitHub токен не найден');
-} 
+}
+
+// Функция добавления нового события
+async function addMarket(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const market = {
+        id: Date.now(),
+        question: formData.get('question'),
+        description: formData.get('description'),
+        rules: {
+            yes: formData.get('yesRule'),
+            no: formData.get('noRule')
+        },
+        yesAmount: 0,
+        noAmount: 0,
+        category: 'crypto',
+        createdAt: new Date().toISOString()
+    };
+
+    try {
+        await saveMarket(market);
+        event.target.reset();
+        showNotification('Событие успешно добавлено');
+    } catch (error) {
+        console.error('Ошибка при добавлении события:', error);
+        showNotification('Ошибка при добавлении события', 'error');
+    }
+}
+
+// Добавляем обработчик формы
+document.querySelector('#addMarketForm').addEventListener('submit', addMarket); 

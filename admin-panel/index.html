@@ -1,80 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Админ-панель Prediction Markets</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-        }
-        .admin-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .logout-button {
-            padding: 8px 16px;
-            background: #ea4335;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .create-form {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        button[type="submit"] {
-            background: #34a853;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .markets-list {
-            display: grid;
-            gap: 15px;
-        }
-        .market-card {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: white;
-        }
-        .actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        .actions button {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <div class="admin-container">
@@ -90,12 +20,12 @@
 
         <div class="create-form">
             <h2>Создать новое событие</h2>
-            <form id="createEventForm" onsubmit="createMarketEvent(event)">
-                <input type="text" name="question" placeholder="Вопрос события" required>
-                <textarea name="description" placeholder="Описание события" required></textarea>
-                <textarea name="yesRule" placeholder="Условие для победы 'ДА'" required></textarea>
-                <textarea name="noRule" placeholder="Условие для победы 'НЕТ'" required></textarea>
-                <button type="submit">Создать событие</button>
+            <form id="addMarketForm">
+                <input type="text" name="question" placeholder="Вопрос" required>
+                <textarea name="description" placeholder="Описание" required></textarea>
+                <input type="text" name="yesRule" placeholder="Правило для YES" required>
+                <input type="text" name="noRule" placeholder="Правило для NO" required>
+                <button type="submit">Добавить событие</button>
             </form>
         </div>
 
@@ -103,6 +33,6 @@
             <!-- События будут добавляться сюда -->
         </div>
     </div>
-    <script src="admin.js"></script>
+    <script type="module" src="admin.js"></script>
 </body>
 </html>

@@ -316,39 +316,39 @@ function showMarketDetails(market) {
     showSection('marketDetails');
 }
 
-// Функция для получения всех событий
+// Функция получения событий
 async function getMarkets() {
     try {
         return await getMarketsData();
     } catch (error) {
-        console.error('Ошибка при получении рынков:', error);
+        console.error('Ошибка при получении событий:', error);
         return [];
     }
 }
 
-// Обновляем список событий в основном приложении
+// Обновление отображения
 async function updateMarketsDisplay() {
     const marketsList = document.getElementById('marketsList');
     if (!marketsList) return;
 
-    const currentMarkets = await getMarkets();
-    console.log('Обновление списка рынков:', currentMarkets);
+    try {
+        const markets = await getMarkets();
+        console.log('Загруженные события:', markets);
 
-    // Очищаем список
-    marketsList.innerHTML = '';
+        marketsList.innerHTML = '';
+        
+        if (!markets || markets.length === 0) {
+            marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
+            return;
+        }
 
-    // Проверяем наличие событий
-    if (!currentMarkets || currentMarkets.length === 0) {
-        marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
-        return;
+        markets.forEach(market => {
+            const card = createMarketCard(market);
+            marketsList.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Ошибка при обновлении событий:', error);
     }
-
-    // Создаем карточки для каждого события
-    currentMarkets.forEach(market => {
-        console.log('Создаем карточку для события:', market);  // Отладочный вывод
-        const card = createMarketCard(market);
-        marketsList.appendChild(card);
-    });
 }
 
 // Вызываем обновление при загрузке страницы
@@ -418,20 +418,10 @@ window.addEventListener('showMarketDetails', (event) => {
 });
 
 // Добавляем слушатель сообщений от админ-панели
-window.addEventListener('message', (event) => {
+window.addEventListener('message', async (event) => {
     if (event.data.type === 'MARKET_UPDATED') {
-        console.log('Получено обновление рынков:', event.data.markets);
-        // Проверяем структуру данных
-        if (Array.isArray(event.data.markets)) {
-            console.log('Количество событий:', event.data.markets.length);
-            event.data.markets.forEach((market, index) => {
-                console.log(`Событие ${index + 1}:`, market);
-            });
-        }
-        
-        localStorage.setItem('adminMarkets', JSON.stringify(event.data.markets));
-        syncWithAdmin();
-        updateMarketsDisplay();
+        console.log('Получено обновление от админ-панели:', event.data.markets);
+        await updateMarketsDisplay();
     }
 });
 

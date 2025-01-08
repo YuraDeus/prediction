@@ -1,10 +1,9 @@
+import { getMarketsData, saveMarketsData } from '../src/storage.js';
+
 // Проверка авторизации
 if (localStorage.getItem('adminAuthenticated') !== 'true') {
     window.location.href = 'login.html';
 }
-
-// Глобальные переменные
-let markets = [];
 
 // Функция показа уведомления (упрощенная версия)
 function showNotification(message, type = 'success') {
@@ -282,9 +281,30 @@ function editMarket(id) {
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('markets');
-    if (saved) {
-        markets = JSON.parse(saved);
-    }
+    loadMarkets();
+});
+
+async function loadMarkets() {
+    markets = await getMarketsData();
     displayMarkets();
-}); 
+}
+
+async function saveMarkets() {
+    await saveMarketsData(markets);
+    // Отправляем сообщение в основное приложение
+    window.parent.postMessage({
+        type: 'MARKET_UPDATED',
+        markets: markets
+    }, '*');
+}
+
+function setGithubToken(token) {
+    localStorage.setItem('GITHUB_TOKEN', token);
+}
+
+// При успешной авторизации
+if (localStorage.getItem('GITHUB_TOKEN')) {
+    console.log('GitHub токен найден');
+} else {
+    console.error('GitHub токен не найден');
+} 

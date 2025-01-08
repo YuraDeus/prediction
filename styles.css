@@ -1,17 +1,17 @@
 :root {
-    --tg-theme-bg-color: var(--tg-theme-bg-color, #f5f5f5);
+    --tg-theme-bg-color: var(--tg-theme-bg-color, #e8f5e9);
     --tg-theme-text-color: var(--tg-theme-text-color, #000000);
     --tg-theme-hint-color: var(--tg-theme-hint-color, #999999);
     --tg-theme-link-color: var(--tg-theme-link-color, #2481cc);
     --tg-theme-button-color: var(--tg-theme-button-color, #2481cc);
     --tg-theme-button-text-color: var(--tg-theme-button-text-color, #ffffff);
-    --tg-theme-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+    --tg-theme-secondary-bg-color: var(--tg-theme-secondary-bg-color, #c8e6c9);
     
     /* Добавим новые цвета */
     --accent-green: #32cd32;
     --accent-red: #ff4500;
     --accent-blue: #4285f4;
-    --gradient-primary: linear-gradient(135deg, #ffd700, #ffa500);
+    --gradient-primary: linear-gradient(135deg, #4CAF50, #2E7D32);
     --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
     --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
     --shadow-lg: 0 8px 16px rgba(0,0,0,0.1);

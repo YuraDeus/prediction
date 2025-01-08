@@ -1,4 +1,5 @@
 import { telegramSession } from './src/telegram.js';
+import { getMarketsData } from './src/storage.js';
 
 // В начале файла добавим версию
 const APP_VERSION = new Date().getTime();
@@ -316,11 +317,9 @@ function showMarketDetails(market) {
 }
 
 // Функция для получения всех событий
-function getMarkets() {
+async function getMarkets() {
     try {
-        const markets = localStorage.getItem('markets');
-        console.log('Загруженные события:', markets);
-        return markets ? JSON.parse(markets) : [];
+        return await getMarketsData();
     } catch (error) {
         console.error('Ошибка при получении рынков:', error);
         return [];
@@ -328,11 +327,11 @@ function getMarkets() {
 }
 
 // Обновляем список событий в основном приложении
-function updateMarketsDisplay() {
+async function updateMarketsDisplay() {
     const marketsList = document.getElementById('marketsList');
     if (!marketsList) return;
 
-    const currentMarkets = getMarkets();
+    const currentMarkets = await getMarkets();
     console.log('Обновление списка рынков:', currentMarkets);
 
     // Очищаем список

@@ -1,4 +1,4 @@
-import { saveMarkets, getMarkets } from '../src/storage.js';
+import { getMarketsData, saveMarketsData } from '../src/storage.js';
 
 // Глобальные переменные
 let markets = [];
@@ -9,7 +9,7 @@ function showNotification(message, type = 'success') {
 }
 
 // Функция добавления нового события
-function addMarket(event) {
+async function addMarket(event) {
     event.preventDefault();
     
     const formData = new FormData(event.target);
@@ -33,17 +33,18 @@ function addMarket(event) {
     markets.push(market);
     
     // Сохраняем в общее хранилище
-    saveMarkets(markets);
-    
-    // Отправляем сообщение в основное приложение
     try {
+        const currentMarkets = await getMarketsData();
+        currentMarkets.push(market);
+        await saveMarketsData(currentMarkets);
+        
+        // Отправляем сообщение в основное приложение
         window.parent.postMessage({
             type: 'MARKET_UPDATED',
-            markets: markets
+            markets: currentMarkets
         }, '*');
-        console.log('Сообщение отправлено в основное приложение');
     } catch (error) {
-        console.error('Ошибка отправки сообщения:', error);
+        console.error('Ошибка сохранения:', error);
     }
     
     // Очищаем форму и обновляем отображение

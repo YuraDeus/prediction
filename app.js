@@ -1,5 +1,5 @@
 import { telegramSession } from './src/telegram.js';
-import { getMarkets } from './src/storage.js';
+import { getMarketsData } from './src/storage.js';
 
 // В начале файла добавим версию
 const APP_VERSION = new Date().getTime();
@@ -340,24 +340,17 @@ async function getMarketsFromStorage() {
 
 // Обновление отображения
 async function updateMarketsDisplay() {
-    const marketsList = document.getElementById('marketsList');
-    if (!marketsList) return;
-
-    const markets = getMarkets();
-    console.log('Пытаемся отобразить события:', markets);
-    
-    marketsList.innerHTML = '';
-    
-    if (!markets || markets.length === 0) {
-        marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
-        return;
+    try {
+        const markets = await getMarketsData();
+        // Отображаем события
+        displayMarkets(markets);
+    } catch (error) {
+        console.error('Ошибка загрузки:', error);
     }
-
-    markets.forEach(market => {
-        const card = createMarketCard(market);
-        marketsList.appendChild(card);
-    });
 }
+
+// Периодически проверяем обновления
+setInterval(updateMarketsDisplay, 30000);
 
 // Вызываем обновление при загрузке страницы
 document.addEventListener('DOMContentLoaded', updateMarketsDisplay);

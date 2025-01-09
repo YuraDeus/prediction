@@ -1,1 +1,17 @@
-[] 
+{
+    "markets": [
+        {
+            "id": 1,
+            "question": "Пример события",
+            "description": "Описание события",
+            "rules": {
+                "yes": "Правило для YES",
+                "no": "Правило для NO"
+            },
+            "yesAmount": 0,
+            "noAmount": 0,
+            "category": "crypto",
+            "createdAt": "2024-01-08T10:00:00.000Z"
+        }
+    ]
+} 

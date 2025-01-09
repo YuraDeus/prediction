@@ -1,4 +1,5 @@
-import { getMarketsData, saveMarketsData } from '../src/storage.js';
+import { saveMarkets, getMarkets } from '../src/storage.js';
+import { syncWithGitHub } from '../src/github-storage.js';
 
 // Глобальные переменные
 let markets = [];
@@ -32,20 +33,22 @@ async function addMarket(event) {
     // Добавляем событие в массив
     markets.push(market);
     
-    // Сохраняем в общее хранилище
+    // Сохраняем в localStorage
+    saveMarkets(markets);
+    
+    // Синхронизируем с GitHub
     try {
-        const currentMarkets = await getMarketsData();
-        currentMarkets.push(market);
-        await saveMarketsData(currentMarkets);
-        
-        // Отправляем сообщение в основное приложение
-        window.parent.postMessage({
-            type: 'MARKET_UPDATED',
-            markets: currentMarkets
-        }, '*');
+        await syncWithGitHub(markets);
+        console.log('Событие успешно сохранено в GitHub');
     } catch (error) {
-        console.error('Ошибка сохранения:', error);
+        console.error('Ошибка сохранения в GitHub:', error);
     }
+    
+    // Отправляем сообщение в основное приложение
+    window.parent.postMessage({
+        type: 'MARKET_UPDATED',
+        markets: markets
+    }, '*');
     
     // Очищаем форму и обновляем отображение
     event.target.reset();

@@ -1,5 +1,6 @@
 import { telegramSession } from './src/telegram.js';
-import { getMarketsData } from './src/storage.js';
+import { getMarkets } from './src/storage.js';
+import { GITHUB_CONFIG } from './src/config.js';
 
 // В начале файла добавим версию
 const APP_VERSION = new Date().getTime();
@@ -333,19 +334,52 @@ function showMarketDetails(market) {
     showSection('marketDetails');
 }
 
-// Функция получения событий
-async function getMarketsFromStorage() {
-    return getMarkets();
+// Функция получения событий из GitHub
+async function getMarketsFromGitHub() {
+    try {
+        const response = await fetch(GITHUB_CONFIG.REPO_URL);
+        const data = await response.json();
+        const content = atob(data.content);
+        const parsed = JSON.parse(content);
+        return parsed.markets || [];
+    } catch (error) {
+        console.error('Ошибка получения данных из GitHub:', error);
+        return [];
+    }
 }
 
 // Обновление отображения
 async function updateMarketsDisplay() {
     try {
-        const markets = await getMarketsData();
+        // Получаем события из GitHub
+        const marketsFromGitHub = await getMarketsFromGitHub();
+        console.log('События из GitHub:', marketsFromGitHub);
+
+        // Получаем события из localStorage
+        const marketsFromLocal = getMarkets();
+        console.log('События из localStorage:', marketsFromLocal);
+
+        // Объединяем события
+        const allMarkets = [...marketsFromGitHub, ...marketsFromLocal];
+        console.log('Все события:', allMarkets);
+
         // Отображаем события
-        displayMarkets(markets);
+        const marketsList = document.getElementById('marketsList');
+        if (!marketsList) return;
+
+        marketsList.innerHTML = '';
+        
+        if (!allMarkets || allMarkets.length === 0) {
+            marketsList.innerHTML = '<div class="no-markets">Нет активных событий</div>';
+            return;
+        }
+
+        allMarkets.forEach(market => {
+            const card = createMarketCard(market);
+            marketsList.appendChild(card);
+        });
     } catch (error) {
-        console.error('Ошибка загрузки:', error);
+        console.error('Ошибка при обновлении событий:', error);
     }
 }
 
